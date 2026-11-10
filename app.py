@@ -1,24 +1,24 @@
 import streamlit as st
 import pandas as pd
 
-st.title("💰 Simulador de Finanzas Personales")
+st.title(" Simulador de Finanzas Personales")
 
 st.write("Organiza tus ingresos, gastos y ahorro de forma sencilla.")
 
 # INGRESOS
 ingresos = st.number_input(
-    "💵 Ingresos",
+    " Ingresos",
     min_value=0.0,
     value=0.0
 )
 
-st.subheader("📋 Categorías de gastos")
+st.subheader(" Categorías de gastos")
 
-alimentacion = st.number_input("🍔 Alimentación", min_value=0.0)
-transporte = st.number_input("🚌 Transporte", min_value=0.0)
-educacion = st.number_input("📚 Educación", min_value=0.0)
-ocio = st.number_input("🎮 Ocio", min_value=0.0)
-otros = st.number_input("📦 Otros", min_value=0.0)
+alimentacion = st.number_input(" Alimentación", min_value=0.0)
+transporte = st.number_input(" Transporte", min_value=0.0)
+educacion = st.number_input(" Educación", min_value=0.0)
+ocio = st.number_input(" Ocio", min_value=0.0)
+otros = st.number_input(" Otros", min_value=0.0)
 
 total_gastos = (
     alimentacion
@@ -28,9 +28,9 @@ total_gastos = (
     + otros
 )
 
-st.write(f"💸 Total gastos: ${total_gastos:,.0f}")
+st.write(f" Total gastos: ${total_gastos:,.0f}")
 
-st.subheader("🏦 Ahorro")
+st.subheader(" Ahorro")
 
 tipo_ahorro = st.radio(
     "Selecciona el tipo de ahorro",
@@ -55,7 +55,7 @@ else:
         value=0.0
     )
 
-if st.button("📊 Calcular"):
+if st.button(" Calcular"):
 
     if ahorro > ingresos:
         st.error("⚠️ El ahorro no puede ser mayor que los ingresos.")
@@ -64,14 +64,14 @@ if st.button("📊 Calcular"):
 
         balance = ingresos - total_gastos - ahorro
 
-        st.subheader("📈 Resultados")
+        st.subheader(" Resultados")
 
-        st.write(f"💵 Ingresos: ${ingresos:,.0f}")
-        st.write(f"💸 Gastos: ${total_gastos:,.0f}")
-        st.write(f"🏦 Ahorro: ${ahorro:,.0f}")
-        st.write(f"📊 Balance final: ${balance:,.0f}")
+        st.write(f" Ingresos: ${ingresos:,.0f}")
+        st.write(f" Gastos: ${total_gastos:,.0f}")
+        st.write(f" Ahorro: ${ahorro:,.0f}")
+        st.write(f" Balance final: ${balance:,.0f}")
 
-        st.subheader("🚦 Diagnóstico financiero")
+        st.subheader(" Diagnóstico financiero")
 
         porcentaje_restante = (
             balance / ingresos * 100
@@ -105,7 +105,7 @@ if st.button("📊 Calcular"):
             ]
         })
 
-        st.subheader("📊 Distribución de gastos")
+        st.subheader(" Distribución de gastos")
 
         st.bar_chart(
             datos_gastos.set_index("Categoría")
