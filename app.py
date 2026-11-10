@@ -1,4 +1,5 @@
 import streamlit as st
+import pandas as pd
 
 st.title("💰 Simulador de Finanzas Personales")
 
@@ -60,6 +61,7 @@ if st.button("📊 Calcular"):
         st.error("⚠️ El ahorro no puede ser mayor que los ingresos.")
 
     else:
+
         balance = ingresos - total_gastos - ahorro
 
         st.subheader("📈 Resultados")
@@ -83,3 +85,28 @@ if st.button("📊 Calcular"):
             st.warning("🟡 Buen manejo financiero, pero puedes ahorrar más.")
         else:
             st.error("🔴 Debes mejorar el control de tus gastos.")
+
+        # GRAFICO
+
+        datos_gastos = pd.DataFrame({
+            "Categoría": [
+                "Alimentación",
+                "Transporte",
+                "Educación",
+                "Ocio",
+                "Otros"
+            ],
+            "Valor": [
+                alimentacion,
+                transporte,
+                educacion,
+                ocio,
+                otros
+            ]
+        })
+
+        st.subheader("📊 Distribución de gastos")
+
+        st.bar_chart(
+            datos_gastos.set_index("Categoría")
+        )
