@@ -1,11 +1,19 @@
 import streamlit as st
 import pandas as pd
 
+st.set_page_config(
+    page_title="Simulador de Finanzas",
+    page_icon=""
+)
+
 st.title(" Simulador de Finanzas Personales")
 
-st.write("Organiza tus ingresos, gastos y ahorro de forma sencilla.")
+st.write(
+    "Esta herramienta permite organizar ingresos, gastos y ahorro para conocer tu situación financiera."
+)
 
 # INGRESOS
+
 ingresos = st.number_input(
     " Ingresos",
     min_value=0.0,
@@ -21,14 +29,16 @@ ocio = st.number_input(" Ocio", min_value=0.0)
 otros = st.number_input(" Otros", min_value=0.0)
 
 total_gastos = (
-    alimentacion
-    + transporte
-    + educacion
-    + ocio
-    + otros
+    alimentacion +
+    transporte +
+    educacion +
+    ocio +
+    otros
 )
 
-st.write(f" Total gastos: ${total_gastos:,.0f}")
+st.info(f" Gastos totales: ${total_gastos:,.0f}")
+
+# AHORRO
 
 st.subheader(" Ahorro")
 
@@ -46,49 +56,87 @@ if tipo_ahorro == "Por porcentaje":
         max_value=100,
         value=10
     )
+
     ahorro = ingresos * (porcentaje / 100)
 
 else:
     ahorro = st.number_input(
-        "Cantidad de ahorro",
-        min_value=0.0,
-        value=0.0
+        " Cantidad fija de ahorro",
+        min_value=0.0
     )
+
+# BOTÓN
 
 if st.button(" Calcular"):
 
     if ahorro > ingresos:
-        st.error("⚠️ El ahorro no puede ser mayor que los ingresos.")
+        st.error(" El ahorro no puede ser mayor que los ingresos.")
 
     else:
 
         balance = ingresos - total_gastos - ahorro
 
-        st.subheader(" Resultados")
+        st.subheader(" Resumen financiero")
 
-        st.write(f" Ingresos: ${ingresos:,.0f}")
-        st.write(f" Gastos: ${total_gastos:,.0f}")
-        st.write(f" Ahorro: ${ahorro:,.0f}")
-        st.write(f" Balance final: ${balance:,.0f}")
+        col1, col2 = st.columns(2)
 
-        st.subheader(" Diagnóstico financiero")
+        with col1:
+            st.metric("Ingresos", f"${ingresos:,.0f}")
+
+        with col2:
+            st.metric("Balance", f"${balance:,.0f}")
+
+        st.metric("Gastos", f"${total_gastos:,.0f}")
+        st.metric("Ahorro", f"${ahorro:,.0f}")
+
+        # DIAGNÓSTICO
+
+        st.subheader("🚦 Diagnóstico financiero")
 
         porcentaje_restante = (
-            balance / ingresos * 100
-            if ingresos > 0
-            else 0
+            (balance / ingresos) * 100
+            if ingresos > 0 else 0
         )
 
         if porcentaje_restante >= 30:
-            st.success("🟢 Excelente manejo financiero.")
+            st.success(
+                "🟢 Excelente manejo financiero. Mantienes un buen equilibrio entre gasto y ahorro."
+            )
+
         elif porcentaje_restante >= 10:
-            st.warning("🟡 Buen manejo financiero, pero puedes ahorrar más.")
+            st.warning(
+                "🟡 Buen manejo financiero, aunque podrías aumentar tu ahorro."
+            )
+
         else:
-            st.error("🔴 Debes mejorar el control de tus gastos.")
+            st.error(
+                "🔴 Debes mejorar el control de tus gastos."
+            )
 
-        # GRAFICO
+        # RECOMENDACIONES
 
-        datos_gastos = pd.DataFrame({
+        st.subheader(" Recomendaciones")
+
+        if total_gastos > ingresos:
+            st.warning(
+                "Tus gastos son mayores que tus ingresos. Intenta reducir gastos innecesarios."
+            )
+
+        elif ahorro >= ingresos * 0.2:
+            st.success(
+                "Excelente hábito de ahorro. Estás destinando más del 20% de tus ingresos."
+            )
+
+        else:
+            st.info(
+                "Puedes plantearte una meta de ahorro mayor para mejorar tu planificación financiera."
+            )
+
+        # TABLA
+
+        st.subheader(" Distribución de gastos")
+
+        tabla = pd.DataFrame({
             "Categoría": [
                 "Alimentación",
                 "Transporte",
@@ -105,8 +153,12 @@ if st.button(" Calcular"):
             ]
         })
 
-        st.subheader(" Distribución de gastos")
+        st.dataframe(tabla)
+
+        # GRÁFICO
+
+        st.subheader(" Gráfico de gastos")
 
         st.bar_chart(
-            datos_gastos.set_index("Categoría")
+            tabla.set_index("Categoría")
         )
