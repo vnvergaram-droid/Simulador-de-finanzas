@@ -1,10 +1,16 @@
 import streamlit as st
 import pandas as pd
+from datetime import datetime
 
 st.set_page_config(
     page_title="Simulador de Finanzas",
     page_icon=""
 )
+
+# HISTORIAL
+
+if "historial" not in st.session_state:
+    st.session_state.historial = []
 
 st.title(" Simulador de Finanzas Personales")
 
@@ -50,6 +56,7 @@ tipo_ahorro = st.radio(
 ahorro = 0
 
 if tipo_ahorro == "Por porcentaje":
+
     porcentaje = st.slider(
         "Porcentaje de ahorro (%)",
         min_value=0,
@@ -60,6 +67,7 @@ if tipo_ahorro == "Por porcentaje":
     ahorro = ingresos * (porcentaje / 100)
 
 else:
+
     ahorro = st.number_input(
         " Cantidad fija de ahorro",
         min_value=0.0
@@ -70,24 +78,52 @@ else:
 if st.button(" Calcular"):
 
     if ahorro > ingresos:
-        st.error(" El ahorro no puede ser mayor que los ingresos.")
+
+        st.error(
+            " El ahorro no puede ser mayor que los ingresos."
+        )
 
     else:
 
         balance = ingresos - total_gastos - ahorro
+
+        # GUARDAR EN HISTORIAL
+
+        registro = {
+            "Fecha": datetime.now().strftime("%H:%M:%S"),
+            "Ingresos": ingresos,
+            "Gastos": total_gastos,
+            "Ahorro": ahorro,
+            "Balance": balance
+        }
+
+        st.session_state.historial.append(registro)
 
         st.subheader(" Resumen financiero")
 
         col1, col2 = st.columns(2)
 
         with col1:
-            st.metric("Ingresos", f"${ingresos:,.0f}")
+            st.metric(
+                "Ingresos",
+                f"${ingresos:,.0f}"
+            )
 
         with col2:
-            st.metric("Balance", f"${balance:,.0f}")
+            st.metric(
+                "Balance",
+                f"${balance:,.0f}"
+            )
 
-        st.metric("Gastos", f"${total_gastos:,.0f}")
-        st.metric("Ahorro", f"${ahorro:,.0f}")
+        st.metric(
+            "Gastos",
+            f"${total_gastos:,.0f}"
+        )
+
+        st.metric(
+            "Ahorro",
+            f"${ahorro:,.0f}"
+        )
 
         # DIAGNÓSTICO
 
@@ -99,16 +135,19 @@ if st.button(" Calcular"):
         )
 
         if porcentaje_restante >= 30:
+
             st.success(
-                "🟢 Excelente manejo financiero. Mantienes un buen equilibrio entre gasto y ahorro."
+                "🟢 Excelente manejo financiero."
             )
 
         elif porcentaje_restante >= 10:
+
             st.warning(
-                "🟡 Buen manejo financiero, aunque podrías aumentar tu ahorro."
+                "🟡 Buen manejo financiero."
             )
 
         else:
+
             st.error(
                 "🔴 Debes mejorar el control de tus gastos."
             )
@@ -118,18 +157,21 @@ if st.button(" Calcular"):
         st.subheader(" Recomendaciones")
 
         if total_gastos > ingresos:
+
             st.warning(
-                "Tus gastos son mayores que tus ingresos. Intenta reducir gastos innecesarios."
+                "Tus gastos son mayores que tus ingresos."
             )
 
         elif ahorro >= ingresos * 0.2:
+
             st.success(
-                "Excelente hábito de ahorro. Estás destinando más del 20% de tus ingresos."
+                "Excelente hábito de ahorro."
             )
 
         else:
+
             st.info(
-                "Puedes plantearte una meta de ahorro mayor para mejorar tu planificación financiera."
+                "Puedes plantearte una meta de ahorro mayor."
             )
 
         # TABLA
@@ -161,4 +203,39 @@ if st.button(" Calcular"):
 
         st.bar_chart(
             tabla.set_index("Categoría")
+        )
+
+# HISTORIAL
+
+if len(st.session_state.historial) > 0:
+
+    st.subheader(" Historial de registros")
+
+    historial_df = pd.DataFrame(
+        st.session_state.historial
+    )
+
+    st.dataframe(historial_df)
+
+    if len(historial_df) >= 2:
+
+        st.subheader(" Comparación con registro anterior")
+
+        ultimo = historial_df.iloc[-1]
+        anterior = historial_df.iloc[-2]
+
+        st.write(
+            f" Diferencia de ingresos: ${ultimo['Ingresos'] - anterior['Ingresos']:,.0f}"
+        )
+
+        st.write(
+            f" Diferencia de gastos: ${ultimo['Gastos'] - anterior['Gastos']:,.0f}"
+        )
+
+        st.write(
+            f" Diferencia de ahorro: ${ultimo['Ahorro'] - anterior['Ahorro']:,.0f}"
+        )
+
+        st.write(
+            f" Diferencia de balance: ${ultimo['Balance'] - anterior['Balance']:,.0f}"
         )
